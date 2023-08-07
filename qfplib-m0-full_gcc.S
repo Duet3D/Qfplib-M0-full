@@ -20,12 +20,17 @@
 .cpu cortex-m0plus
 .thumb
 
+.section .text
+
 @ exported symbols
 
 .global __wrap___aeabi_fadd
 .global __wrap___aeabi_fsub
 .global __wrap___aeabi_fmul
 .global __wrap___aeabi_fdiv
+
+#if 0	// DC we don't use these
+
 .global qfp_fcmp
 .global qfp_fsqrt
 .global qfp_float2int
@@ -85,6 +90,8 @@
 
 .global qfp_double2float
 .global qfp_float2double
+
+#endif
 
 qfp_lib_start:
 
@@ -216,6 +223,8 @@ mul0:
  asrs r1,r3,#5   @ middle partial products Q25
  adds r0,r1      @ final result
  bx r14
+
+#if 0	// DC we don't use these functions
 
 .thumb_func
 qfp_fcmp:
@@ -786,6 +795,8 @@ tab_cc:
 .word 0x00040000*4+0
 .word 0x00020000*4+0+2   @ +2 marks end
 
+#endif
+
 .align 2
 .thumb_func
 __wrap___aeabi_fsub:
@@ -1269,6 +1280,8 @@ rcpapp:
 .byte 252,245,237,231,224,218,213,207,202,197,193,188,184,180,176,172
 .byte 169,165,162,159,156,153,150,148,145,142,140,138,135,133,131,129
 
+#if 0	// DC we already have a square root function that uses the SAMC21 DIVAS unit
+
 @ The square root routine uses an initial approximation to the reciprocal of the square root of the argument based
 @ on the top four bits of the mantissa (possibly shifted one place to make the exponent even). It then performs two
 @ Newton-Raphson iterations, resulting in about 14 bits of accuracy. This reciprocal is then multiplied by
@@ -1373,7 +1386,9 @@ sq_2:
 rsqrtapp:
 .byte 0xf1,0xda,0xc9,0xbb, 0xb0,0xa6,0x9e,0x97, 0x91,0x8b,0x86,0x82
 
+#endif
 
+#if 0	// DC we don't need the double functions
 
 @ Notation:
 @ rx:ry means the concatenation of rx and ry with rx having the less significant bits
@@ -3571,5 +3586,7 @@ dtab_exp:
 .word 0xfffffffe, 0x00000000   @ log 1+2^-30 Q62
 .word 0x80000000, 0x00000000   @ log 1+2^-31 Q62
 .word 0x40000000, 0x00000000   @ log 1+2^-32 Q62
+
+#endif
 
 qfp_lib_end:
