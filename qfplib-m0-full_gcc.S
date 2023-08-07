@@ -22,10 +22,10 @@
 
 @ exported symbols
 
-.global qfp_fadd
-.global qfp_fsub
-.global qfp_fmul
-.global qfp_fdiv
+.global __wrap___aeabi_fadd
+.global __wrap___aeabi_fsub
+.global __wrap___aeabi_fmul
+.global __wrap___aeabi_fdiv
 .global qfp_fcmp
 .global qfp_fsqrt
 .global qfp_float2int
@@ -788,13 +788,13 @@ tab_cc:
 
 .align 2
 .thumb_func
-qfp_fsub:
+__wrap___aeabi_fsub:
  ldr r2,=#0x80000000
  eors r1,r2    @ flip sign on second argument
 @ drop into fadd, on .align2:ed boundary
 
 .thumb_func
-qfp_fadd:
+__wrap___aeabi_fadd:
  push {r4,r5,r6,r14}
  asrs r4,r0,#31
  lsls r2,r0,#1
@@ -835,7 +835,7 @@ fa_ye:
  b fa_0
 
 .ltorg
- 
+
 fa_ymgtx:
  movs r2,#0      @ result is just y
  movs r0,r1
@@ -857,7 +857,7 @@ fa_ygtx:
 fa_0:
  adds r0,r1      @ result is now in r0:r2, possibly highly denormalised or zero; exponent in r3
  beq fa_9        @ if zero, inputs must have been of identical magnitude and opposite sign, so return +0
-fa_1: 
+fa_1:
  lsrs r1,r0,#31  @ sign bit
  beq fa_8
  mvns r0,r0
@@ -944,7 +944,7 @@ fa_ye255:
 
 .align 2
 .thumb_func
-qfp_fmul:
+__wrap___aeabi_fmul:
  push {r7,r14}
  mov r2,r0
  eors r2,r1       @ sign of result
@@ -1089,7 +1089,7 @@ fm_4:
 @ to calculate the exact remainder when close to a rounding boundary.
 .align 2
 .thumb_func
-qfp_fdiv:
+__wrap___aeabi_fdiv:
  push {r4,r5,r6,r14}
 fdiv_n:
 
@@ -1681,7 +1681,7 @@ l\@_1:
  uxth \rt3,\rx                 @                   xl
  muls \rt3,\rt4                @                 xlyh=M1
  asrs \rt4,\rt1,#31            @                      M0sx   (M1 sign extension is zero)
- adds \rt1,\rt3                @      M0+M1=M 
+ adds \rt1,\rt3                @      M0+M1=M
  movs \rt3,#0                  @                    0
  adcs \rt4,\rt3                @                      ¯Msx
  lsls \rt4,#16                 @                    ¯Msx<<16
@@ -1737,7 +1737,7 @@ l\@_1:
 .macro square32_64 rx,rzl,rzh,rt0,rt1,rt2
                                @   t0   t1   t2   zl   zh
  uxth \rt0,\rx                 @   xl
- muls \rt0,\rt0                @ xlxl=L 
+ muls \rt0,\rt0                @ xlxl=L
  uxth \rt1,\rx                 @        xl
  lsrs \rt2,\rx,#16             @             xh
  muls \rt1,\rt2                @      xlxh=M
@@ -2332,7 +2332,7 @@ qfp_dsqrt:
  pop {r4-r7,r15}
 
 .ltorg
- 
+
 
 @ round(sqrt(2^22./[68:8:252]))
 drsqrtapp:
@@ -2426,7 +2426,7 @@ dcmp_fast_entry:
  cmp r1,#0
  bge 2b
  b 3b
- 
+
 
 @ "scientific" functions start here
 
@@ -3224,7 +3224,7 @@ qfp_datan2:
  movs r0,#0
  movs r1,#0
  b 12f
- 
+
 1:
  bl qfp_ddiv
  movs r2,#62
