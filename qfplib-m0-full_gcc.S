@@ -797,7 +797,7 @@ tab_cc:
 
 #endif
 
-.align 2
+.align 8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
 __wrap___aeabi_fsub:
  ldr r2,=#0x80000000
@@ -953,7 +953,7 @@ fa_ye255:
  b fa_ye
 
 
-.align 2
+.align 8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
 __wrap___aeabi_fmul:
  push {r7,r14}
@@ -1098,7 +1098,7 @@ fm_4:
 @ quotient estimate; then the remainder based on this estimate is used to calculate a
 @ correction to the quotient. The result is good to about 27 bits and so we only need
 @ to calculate the exact remainder when close to a rounding boundary.
-.align 2
+.align 8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
 __wrap___aeabi_fdiv:
  push {r4,r5,r6,r14}
