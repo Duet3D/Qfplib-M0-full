@@ -95,6 +95,8 @@
 
 qfp_lib_start:
 
+#if 0	// DC we don't use these
+
 @ exchange r0<->r1, r2<->r3
 xchxy:
  push {r0,r2,r14}
@@ -223,8 +225,6 @@ mul0:
  asrs r1,r3,#5   @ middle partial products Q25
  adds r0,r1      @ final result
  bx r14
-
-#if 0	// DC we don't use these functions
 
 .thumb_func
 qfp_fcmp:
