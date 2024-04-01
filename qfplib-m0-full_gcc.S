@@ -28,6 +28,7 @@
 .global __wrap___aeabi_fsub
 .global __wrap___aeabi_fmul
 .global __wrap___aeabi_fdiv
+.global _Z9fastSqrtff
 
 #if 0	// DC we don't use these
 
@@ -1280,7 +1281,7 @@ rcpapp:
 .byte 252,245,237,231,224,218,213,207,202,197,193,188,184,180,176,172
 .byte 169,165,162,159,156,153,150,148,145,142,140,138,135,133,131,129
 
-#if 0	// DC we already have a square root function that uses the SAMC21 DIVAS unit
+@ DC - we renamed this to _Z9fastSqrtff so that it matches fastQsrtf(float) noexcept in C++
 
 @ The square root routine uses an initial approximation to the reciprocal of the square root of the argument based
 @ on the top four bits of the mantissa (possibly shifted one place to make the exponent even). It then performs two
@@ -1292,9 +1293,9 @@ rcpapp:
 @ Again, the fixed-point calculation is carefully implemented to preserve accuracy, and similar comments to those
 @ made above on the fast division routine apply.
 @ The reciprocal square root calculation has been tested for all possible (possibly shifted) input mantissa values.
-.align 2
+.align  8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
-qfp_fsqrt:
+_Z9fastSqrtff:
  push {r4}
  lsls r1,r0,#1
  bcs sq_0         @ negative?
@@ -1386,7 +1387,6 @@ sq_2:
 rsqrtapp:
 .byte 0xf1,0xda,0xc9,0xbb, 0xb0,0xa6,0x9e,0x97, 0x91,0x8b,0x86,0x82
 
-#endif
 
 #if 0	// DC we don't need the double functions
 
