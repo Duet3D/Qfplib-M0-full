@@ -1281,8 +1281,9 @@ rcpapp:
 .byte 252,245,237,231,224,218,213,207,202,197,193,188,184,180,176,172
 .byte 169,165,162,159,156,153,150,148,145,142,140,138,135,133,131,129
 
-@ DC - we renamed this to _Z9fastSqrtff so that it matches fastQsrtf(float) noexcept in C++
+@ DC - putting tnis in section time_critical (i.e. RAM) instead of text (i.e. flash) reduces execution time from 2.29us to 1.77us.
 
+.section .time_critical
 @ The square root routine uses an initial approximation to the reciprocal of the square root of the argument based
 @ on the top four bits of the mantissa (possibly shifted one place to make the exponent even). It then performs two
 @ Newton-Raphson iterations, resulting in about 14 bits of accuracy. This reciprocal is then multiplied by
@@ -1293,9 +1294,8 @@ rcpapp:
 @ Again, the fixed-point calculation is carefully implemented to preserve accuracy, and similar comments to those
 @ made above on the fast division routine apply.
 @ The reciprocal square root calculation has been tested for all possible (possibly shifted) input mantissa values.
-.align  8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
-_Z9fastSqrtff:
+fastSqrtf:
  push {r4}
  lsls r1,r0,#1
  bcs sq_0         @ negative?
@@ -1387,6 +1387,17 @@ sq_2:
 rsqrtapp:
 .byte 0xf1,0xda,0xc9,0xbb, 0xb0,0xa6,0x9e,0x97, 0x91,0x8b,0x86,0x82
 
+.section .text
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - we renamed this to _Z9fastSqrtff so that it matches fastQsrtf(float) noexcept in C++
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+_Z9fastSqrtff:
+    ldr     r2, fastSqrtf_address_const
+    bx      r2
+
+.align 2
+fastSqrtf_address_const: .word fastSqrtf+1
 
 #if 0	// DC we don't need the double functions
 
