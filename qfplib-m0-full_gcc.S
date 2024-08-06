@@ -798,7 +798,7 @@ tab_cc:
 
 #endif
 
-.align 8		  @ DC align on a SAMC21 NVM cache boundary
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 .thumb_func
 __wrap___aeabi_fsub:
  ldr r2,=#0x80000000
@@ -954,7 +954,7 @@ fa_ye255:
  b fa_ye
 
 
-.align 8		  @ DC align on a SAMC21 NVM cache boundary
+.balign 8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
 __wrap___aeabi_fmul:
  push {r7,r14}
@@ -1099,7 +1099,7 @@ fm_4:
 @ quotient estimate; then the remainder based on this estimate is used to calculate a
 @ correction to the quotient. The result is good to about 27 bits and so we only need
 @ to calculate the exact remainder when close to a rounding boundary.
-.align 8		  @ DC align on a SAMC21 NVM cache boundary
+.balign 8		  @ DC align on a SAMC21 NVM cache boundary
 .thumb_func
 __wrap___aeabi_fdiv:
  push {r4,r5,r6,r14}
@@ -1281,9 +1281,10 @@ rcpapp:
 .byte 252,245,237,231,224,218,213,207,202,197,193,188,184,180,176,172
 .byte 169,165,162,159,156,153,150,148,145,142,140,138,135,133,131,129
 
-@ DC - putting tnis in section time_critical (i.e. RAM) instead of text (i.e. flash) reduces execution time from 2.29us to 1.77us.
+@ DC - putting this in section time_critical (i.e. RAM) instead of text (i.e. flash) reduces execution time from 2.29us to 1.77us.
 
 .section .time_critical
+.balign 8
 @ The square root routine uses an initial approximation to the reciprocal of the square root of the argument based
 @ on the top four bits of the mantissa (possibly shifted one place to make the exponent even). It then performs two
 @ Newton-Raphson iterations, resulting in about 14 bits of accuracy. This reciprocal is then multiplied by
