@@ -38,7 +38,7 @@
 .global __wrap___aeabi_f2iz
 .global _Z9fastSqrtff
 
-#if EXEC_IN_RAM
+# if EXEC_IN_RAM
 
 @ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
@@ -89,26 +89,26 @@ __wrap___aeabi_f2uiz:
     bx      r2
 
 @ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - we renamed this to _Z9fastSqrtff so that it matches fastQsrtf(float) noexcept in C++
+@ DC - we renamed this to _Z9fastSqrtff so that it matches fastSqrtf(float) noexcept in C++
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
 _Z9fastSqrtff:
     ldr     r2, qfp_fsqrt_address_const
     bx      r2
 
 .align 2
-qfp_fadd_address_const: .word qfp_fadd+1
-qfp_fsub_address_const: .word qfp_fsub+1
-qfp_fmul_address_const: .word qfp_fmul+1
-qfp_fdiv_address_const: .word qfp_fdiv+1
-qfp_i2f_address_const:  .word qfp_int2float+1
-qfp_ui2f_address_const: .word qfp_uint2float+1
-qfp_f2iz_address_const: .word qfp_float2int_z+1
-qfp_f2uiz_address_const: .word qfp_float2uint+1
-qfp_fsqrt_address_const: .word qfp_fsqrt+1
+qfp_fadd_address_const:		.word qfp_fadd+1
+qfp_fsub_address_const:		.word qfp_fsub+1
+qfp_fmul_address_const:		.word qfp_fmul+1
+qfp_fdiv_address_const:		.word qfp_fdiv+1
+qfp_i2f_address_const:		.word qfp_int2float+1
+qfp_ui2f_address_const:		.word qfp_uint2float+1
+qfp_f2iz_address_const:		.word qfp_float2int_z+1
+qfp_f2uiz_address_const:	.word qfp_float2uint+1
+qfp_fsqrt_address_const:	.word qfp_fsqrt+1
 
 .section time_critical
 
-#endif
+# endif
 
 #endif
 
@@ -189,7 +189,7 @@ qfp_fsqrt_address_const: .word qfp_fsqrt+1
 
 qfp_lib_start:
 
-#if 0	// DC we don't use these
+#if 0	// DC we don't use this
 
 @ exchange r0<->r1, r2<->r3
 xchxy:
@@ -202,6 +202,9 @@ xchxy:
 
 @ IEEE single in r0-> signed (two's complemennt) mantissa in r0 9Q23 (24 significant bits), signed exponent (bias removed) in r2
 @ trashes r4; zero, denormal -> mantissa=+/-1, exponent=-380; Inf, NaN -> mantissa=+/-1, exponent=+640
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 unpackx:
  lsrs r2,r0,#23 @ save exponent and sign
  lsls r0,#9     @ extract mantissa
