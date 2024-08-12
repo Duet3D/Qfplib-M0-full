@@ -2,7 +2,7 @@
 #define __QFPLIB_M0_FULL_H__
 
 /*
-Copyright 2019-2020 Mark Owen
+Copyright 2019-2024 Mark Owen
 http://www.quinapalus.com
 E-mail: qfp@quinapalus.com
 
@@ -68,6 +68,8 @@ extern i64    qfp_float2int64  (float x);
 extern i64    qfp_float2fix64  (float x,int f);
 extern ui64   qfp_float2uint64 (float x);
 extern ui64   qfp_float2ufix64 (float x,int f);
+extern i32    qfp_float2int_z   (float x);
+extern i64    qfp_float2int64_z (float x);
 
 extern i32    qfp_double2int   (double x);
 extern i32    qfp_double2fix   (double x,int f);
@@ -77,6 +79,8 @@ extern i64    qfp_double2int64 (double x);
 extern i64    qfp_double2fix64 (double x,int f);
 extern ui64   qfp_double2uint64(double x);
 extern ui64   qfp_double2ufix64(double x,int f);
+extern i32    qfp_double2int_z  (double x);
+extern i64    qfp_double2int64_z(double x);
 
 extern double qfp_int2double   (i32  x);
 extern double qfp_fix2double   (i32  x,int f);

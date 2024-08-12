@@ -1,4 +1,4 @@
-@ Copyright 2019-2020 Mark Owen
+@ Copyright 2019-2024 Mark Owen
 @ http://www.quinapalus.com
 @ E-mail: qfp@quinapalus.com
 @
@@ -20,6 +20,10 @@
 .cpu cortex-m0plus
 .thumb
 
+#if 1	// DC
+
+#define EXEC_IN_RAM		1
+
 .section .text
 
 @ exported symbols
@@ -28,10 +32,90 @@
 .global __wrap___aeabi_fsub
 .global __wrap___aeabi_fmul
 .global __wrap___aeabi_fdiv
+.global __wrap___aeabi_ui2f
+.global __wrap___aeabi_i2f
+.global __wrap___aeabi_f2uiz
+.global __wrap___aeabi_f2iz
 .global _Z9fastSqrtff
 
-#if 0	// DC we don't use these
+#if EXEC_IN_RAM
 
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_fadd:
+    ldr     r2, qfp_fadd_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_fsub:
+    ldr     r2, qfp_fsub_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_fmul:
+    ldr     r2, qfp_fmul_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_fdiv:
+    ldr     r2, qfp_fdiv_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_i2f:
+    ldr     r2, qfp_i2f_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_ui2f:
+    ldr     r2, qfp_ui2f_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_f2iz:
+    ldr     r2, qfp_f2iz_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+__wrap___aeabi_f2uiz:
+    ldr     r2, qfp_f2uiz_address_const
+    bx      r2
+
+@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - we renamed this to _Z9fastSqrtff so that it matches fastQsrtf(float) noexcept in C++
+@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+_Z9fastSqrtff:
+    ldr     r2, qfp_fsqrt_address_const
+    bx      r2
+
+.align 2
+qfp_fadd_address_const: .word qfp_fadd+1
+qfp_fsub_address_const: .word qfp_fsub+1
+qfp_fmul_address_const: .word qfp_fmul+1
+qfp_fdiv_address_const: .word qfp_fdiv+1
+qfp_i2f_address_const:  .word qfp_int2float+1
+qfp_ui2f_address_const: .word qfp_uint2float+1
+qfp_f2iz_address_const: .word qfp_float2int_z+1
+qfp_f2uiz_address_const: .word qfp_float2uint+1
+qfp_fsqrt_address_const: .word qfp_fsqrt+1
+
+.section time_critical
+
+#endif
+
+#endif
+
+.global qfp_fadd
+.global qfp_fsub
+.global qfp_fmul
+.global qfp_fdiv
 .global qfp_fcmp
 .global qfp_fsqrt
 .global qfp_float2int
@@ -42,6 +126,8 @@
 .global qfp_fix2float
 .global qfp_uint2float
 .global qfp_ufix2float
+
+#if 0	// DC we don't use these
 .global qfp_int642float
 .global qfp_fix642float
 .global qfp_uint642float
@@ -70,6 +156,12 @@
 .global qfp_float2fix64
 .global qfp_float2uint64
 .global qfp_float2ufix64
+#endif
+
+.global qfp_float2int_z
+
+#if 0	// DC we don't use these
+.global qfp_float2int64_z
 
 .global qfp_double2int
 .global qfp_double2fix
@@ -79,6 +171,8 @@
 .global qfp_double2fix64
 .global qfp_double2uint64
 .global qfp_double2ufix64
+.global qfp_double2int_z
+.global qfp_double2int64_z
 
 .global qfp_int2double
 .global qfp_fix2double
@@ -91,7 +185,6 @@
 
 .global qfp_double2float
 .global qfp_float2double
-
 #endif
 
 qfp_lib_start:
@@ -104,6 +197,8 @@ xchxy:
  mov r0,r1
  mov r2,r3
  pop {r1,r3,r15}
+
+#endif
 
 @ IEEE single in r0-> signed (two's complemennt) mantissa in r0 9Q23 (24 significant bits), signed exponent (bias removed) in r2
 @ trashes r4; zero, denormal -> mantissa=+/-1, exponent=-380; Inf, NaN -> mantissa=+/-1, exponent=+640
@@ -139,6 +234,9 @@ unpackx:
 @ normalise and pack signed mantissa in r0 nominally 3Q29, signed exponent in r2-> IEEE single in r0
 @ trashes r4, preserves r1,r3
 @ r5: "sticky bits", must be zero iff all result bits below r0 are zero for correct rounding
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 packx:
  lsrs r4,r0,#31 @ save sign bit
  lsls r4,r4,#31 @ sign now in b31
@@ -197,6 +295,8 @@ packx0:
  lsrs r0,#9     @ ensure even result
  lsls r0,#10
  b 9b
+
+ #if 0		// DC we don't need this
 
 .align 2
 .ltorg
@@ -272,7 +372,45 @@ qfp_fcmp:
  bge 2b
  b 3b
 
+#endif
+
+@ convert float to signed int, rounding towards 0, clamping
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
+.thumb_func
+#if !EXEC_IN_RAM
+__wrap___aeabi_f2iz:
+#endif
+qfp_float2int_z:
+ push {r14}
+ cmp r0,#0
+ blt 1f
+ bl qfp_float2int   @ +ve or zero? then use rounding towards -Inf
+ cmp r0,#0
+ bge 2f
+ ldr r0,=#0x7fffffff
+2:
+ pop {r15}
+1:
+ lsls r0,#1          @ -ve: clear sign bit
+ lsrs r0,#1
+ bl qfp_float2uint   @ convert to unsigned, rounding towards -Inf
+ cmp r0,#0
+ blt 1f
+ rsbs r0,#0
+ pop {r15}
+1:
+ movs r0,#1
+ lsls r0,#31         @ 0x80000000
+ pop {r15}
+
+.ltorg
+
 @ convert float to signed int, rounding towards -Inf, clamping
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
 qfp_float2int:
  movs r1,#0      @ fall through
@@ -311,7 +449,13 @@ qfp_float2fix:
  pop {r4,r15}
 
 @ unsigned version
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
+#if !EXEC_IN_RAM
+__wrap___aeabi_f2uiz:
+#endif
 qfp_float2uint:
  movs r1,#0      @ fall through
 .thumb_func
@@ -330,6 +474,7 @@ qfp_float2ufix:
  lsls r0,r0,r2   @ result fits, left shifted
  pop {r4,r15}
 
+#if 0	// DC we don't use these
 
 @ convert uint64 to float, rounding
 .thumb_func
@@ -380,11 +525,18 @@ qfp_fix642float:
  adds r2,#32+29
  b packret
 
+#endif
+
 @ convert signed int to float, rounding
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
+#if !EXEC_IN_RAM	// DC
+__wrap___aeabi_i2f:
+#endif
 qfp_int2float:
  movs r1,#0      @ fall through
-
 @ convert signed fix to float, rounding; number of r0 bits after point in r1
 .thumb_func
 qfp_fix2float:
@@ -399,9 +551,14 @@ packret:         @ common return point: "pack and return"
 ret_pop45:
  pop {r4,r5,r15}
 
-
 @ unsigned version
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
+#if !EXEC_IN_RAM	// DC
+__wrap___aeabi_ui2f:
+#endif
 qfp_uint2float:
  movs r1,#0      @ fall through
 .thumb_func
@@ -414,6 +571,8 @@ qfp_ufix2float:
  lsls r5,r0,#31  @ one sticky bit
  lsrs r0,#1
  b packret
+
+#if 0	// DC we don't use these
 
 @ All the scientific functions are implemented using the CORDIC algorithm. For notation,
 @ details not explained in the comments below, and a good overall survey see
@@ -798,15 +957,23 @@ tab_cc:
 
 #endif
 
+#if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
+#if !EXEC_IN_RAM
 __wrap___aeabi_fsub:
+#endif
+qfp_fsub:
  ldr r2,=#0x80000000
  eors r1,r2    @ flip sign on second argument
 @ drop into fadd, on .align2:ed boundary
 
 .thumb_func
+#if !EXEC_IN_RAM
 __wrap___aeabi_fadd:
+#endif
+qfp_fadd:
  push {r4,r5,r6,r14}
  asrs r4,r0,#31
  lsls r2,r0,#1
@@ -954,9 +1121,14 @@ fa_ye255:
  b fa_ye
 
 
-.balign 8		  @ DC align on a SAMC21 NVM cache boundary
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
+#if !EXEC_IN_RAM
 __wrap___aeabi_fmul:
+#endif
+qfp_fmul:
  push {r7,r14}
  mov r2,r0
  eors r2,r1       @ sign of result
@@ -1099,9 +1271,14 @@ fm_4:
 @ quotient estimate; then the remainder based on this estimate is used to calculate a
 @ correction to the quotient. The result is good to about 27 bits and so we only need
 @ to calculate the exact remainder when close to a rounding boundary.
+#if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache boundary
+#endif
 .thumb_func
+#if !EXEC_IN_RAM
 __wrap___aeabi_fdiv:
+#endif
+qfp_fdiv:
  push {r4,r5,r6,r14}
 fdiv_n:
 
@@ -1281,10 +1458,6 @@ rcpapp:
 .byte 252,245,237,231,224,218,213,207,202,197,193,188,184,180,176,172
 .byte 169,165,162,159,156,153,150,148,145,142,140,138,135,133,131,129
 
-@ DC - putting this in section time_critical (i.e. RAM) instead of text (i.e. flash) reduces execution time from 2.29us to 1.77us.
-
-.section .time_critical
-.balign 8
 @ The square root routine uses an initial approximation to the reciprocal of the square root of the argument based
 @ on the top four bits of the mantissa (possibly shifted one place to make the exponent even). It then performs two
 @ Newton-Raphson iterations, resulting in about 14 bits of accuracy. This reciprocal is then multiplied by
@@ -1295,8 +1468,14 @@ rcpapp:
 @ Again, the fixed-point calculation is carefully implemented to preserve accuracy, and similar comments to those
 @ made above on the fast division routine apply.
 @ The reciprocal square root calculation has been tested for all possible (possibly shifted) input mantissa values.
+#if !EXEC_IN_RAM
+.balign 8		  @ DC align on a SAMC21 NVM cache line boundary
+#endif
 .thumb_func
-fastSqrtf:
+#if !EXEC_IN_RAM
+_Z9fastSqrtff:
+#endif
+qfp_fsqrt:
  push {r4}
  lsls r1,r0,#1
  bcs sq_0         @ negative?
@@ -1387,18 +1566,6 @@ sq_2:
 @ round(sqrt(2^22./[72:16:248]))
 rsqrtapp:
 .byte 0xf1,0xda,0xc9,0xbb, 0xb0,0xa6,0x9e,0x97, 0x91,0x8b,0x86,0x82
-
-.section .text
-
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - we renamed this to _Z9fastSqrtff so that it matches fastQsrtf(float) noexcept in C++
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-_Z9fastSqrtff:
-    ldr     r2, fastSqrtf_address_const
-    bx      r2
-
-.align 2
-fastSqrtf_address_const: .word fastSqrtf+1
 
 #if 0	// DC we don't need the double functions
 
@@ -2582,6 +2749,25 @@ ret_dzero:
  movs r1,#0
  bx r14
 
+@ convert double to signed int, rounding towards 0, clamping
+.thumb_func
+qfp_double2int_z:
+ cmp r1,#0
+ bge qfp_double2int  @ +ve or zero? then use rounding towards -Inf
+ push {r14}
+ lsls r1,#1          @ -ve: clear sign bit
+ lsrs r1,#1
+ bl qfp_double2uint  @ convert to unsigned, rounding towards -Inf
+ movs r1,#1
+ lsls r1,#31         @ r1=0x80000000
+ cmp r0,r1
+ bhi 1f
+ rsbs r0,#0
+ pop {r15}
+1:
+ mov r0,r1
+ pop {r15}
+
 @ convert packed double in r0:r1 to signed/unsigned 32/64-bit integer/fixed-point value in r0:r1 [with r2 places after point], with rounding towards -Inf
 @ fixed-point versions only work with reasonable values in r2 because of the way dunpacks works
 
@@ -2605,6 +2791,29 @@ qfp_double2ufix:
  adds r2,#32
  bl qfp_double2ufix64
  movs r0,r1
+ pop {r15}
+
+.thumb_func
+qfp_float2int64_z:
+ cmp r0,#0
+ bge qfp_float2int64 @ +ve or zero? then use rounding towards -Inf
+ push {r14}
+ lsls r0,#1          @ -ve: clear sign bit
+ lsrs r0,#1
+ bl qfp_float2uint64 @ convert to unsigned, rounding towards -Inf
+ movs r2,#1
+ lsls r2,#31         @ r2=0x80000000
+ cmp r1,r2
+ bhs 1f
+ mvns r1,r1
+ rsbs r0,#0
+ bcc 2f
+ adds r1,#1
+2:
+ pop {r15}
+1:
+ movs r0,#0
+ mov r1,r2
  pop {r15}
 
 .thumb_func
@@ -2656,6 +2865,28 @@ f2fix:
  mvns r0,r3                    @ return max/min value
  mvns r1,r3
  pop {r4,r15}
+
+.thumb_func
+qfp_double2int64_z:
+ cmp r1,#0
+ bge qfp_double2int64 @ +ve or zero? then use rounding towards -Inf
+ push {r14}
+ lsls r1,#1           @ -ve: clear sign bit
+ lsrs r1,#1
+ bl qfp_double2uint64 @ convert to unsigned, rounding towards -Inf
+ cmp r1,#0
+ blt 1f
+ mvns r1,r1
+ rsbs r0,#0
+ bcc 2f
+ adds r1,#1
+2:
+ pop {r15}
+1:
+ movs r0,#0
+ movs r1,#1
+ lsls r1,#31          @ 0x80000000
+ pop {r15}
 
 .thumb_func
 qfp_double2int64:
