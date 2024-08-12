@@ -331,6 +331,7 @@ qfp_fcmp:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_f2iz, %function
 __wrap___aeabi_f2iz:
 qfp_float2int_z:
  push {r14}
@@ -403,6 +404,7 @@ qfp_float2fix:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_f2uiz, %function
 __wrap___aeabi_f2uiz:
 qfp_float2uint:
  movs r1,#0      @ fall through
@@ -480,6 +482,7 @@ qfp_fix642float:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_i2f, %function
 __wrap___aeabi_i2f:
 qfp_int2float:
  movs r1,#0      @ fall through
@@ -502,6 +505,7 @@ ret_pop45:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_ui2f, %function
 __wrap___aeabi_ui2f:
 qfp_uint2float:
  movs r1,#0      @ fall through
@@ -905,6 +909,7 @@ tab_cc:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_fsub, %function
 __wrap___aeabi_fsub:
 qfp_fsub:
  ldr r2,=#0x80000000
@@ -912,6 +917,7 @@ qfp_fsub:
 @ drop into fadd, on .align2:ed boundary
 
 .thumb_func
+.type __wrap___aeabi_fadd, %function
 __wrap___aeabi_fadd:
 qfp_fadd:
  push {r4,r5,r6,r14}
@@ -1065,6 +1071,7 @@ fa_ye255:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_fmul, %function
 __wrap___aeabi_fmul:
 qfp_fmul:
  push {r7,r14}
@@ -1213,6 +1220,7 @@ fm_4:
 .balign 8		  @ DC align on a SAMC21 NVM cache boundary
 #endif
 .thumb_func
+.type __wrap___aeabi_fdiv, %function
 __wrap___aeabi_fdiv:
 qfp_fdiv:
  push {r4,r5,r6,r14}
@@ -1408,6 +1416,7 @@ rcpapp:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type _Z9fastSqrtff, %function
 _Z9fastSqrtff:
 qfp_fsqrt:
  push {r4}
