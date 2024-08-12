@@ -18,13 +18,24 @@
 
 .syntax unified
 .cpu cortex-m0plus
+.arch armv6s-m
+.fpu softvfp
+.eabi_attribute 20, 1
+.eabi_attribute 21, 1
+.eabi_attribute 23, 3
+.eabi_attribute 24, 1
+.eabi_attribute 25, 1
+.eabi_attribute 26, 1
+.eabi_attribute 30, 2
+.eabi_attribute 34, 0
+.eabi_attribute 38, 1
+.eabi_attribute 18, 4
+
 .thumb
 
 #if 1	// DC
 
 #define EXEC_IN_RAM		1
-
-.section .text
 
 @ exported symbols
 
@@ -40,57 +51,68 @@
 
 # if EXEC_IN_RAM
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+.section .text
+
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_fadd:
     ldr     r2, qfp_fadd_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_fsub:
     ldr     r2, qfp_fsub_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_fmul:
     ldr     r2, qfp_fmul_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_fdiv:
     ldr     r2, qfp_fdiv_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_i2f:
     ldr     r2, qfp_i2f_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_ui2f:
     ldr     r2, qfp_ui2f_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_f2iz:
     ldr     r2, qfp_f2iz_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 __wrap___aeabi_f2uiz:
     ldr     r2, qfp_f2uiz_address_const
     bx      r2
 
-@ DC - Trampoline to allow the code in section time_critical (i.e. RAM) to be called from flash.
+@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
 @ DC - we renamed this to _Z9fastSqrtff so that it matches fastSqrtf(float) noexcept in C++
 @ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
+.thumb_func
 _Z9fastSqrtff:
     ldr     r2, qfp_fsqrt_address_const
     bx      r2
@@ -106,7 +128,11 @@ qfp_f2iz_address_const:		.word qfp_float2int_z+1
 qfp_f2uiz_address_const:	.word qfp_float2uint+1
 qfp_fsqrt_address_const:	.word qfp_fsqrt+1
 
-.section time_critical
+.section .time_critical
+
+#else
+
+.section .text
 
 # endif
 
