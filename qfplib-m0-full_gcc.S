@@ -51,83 +51,6 @@
 
 # if EXEC_IN_RAM
 
-.section .text
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_fadd:
-    ldr     r2, qfp_fadd_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_fsub:
-    ldr     r2, qfp_fsub_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_fmul:
-    ldr     r2, qfp_fmul_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_fdiv:
-    ldr     r2, qfp_fdiv_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_i2f:
-    ldr     r2, qfp_i2f_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_ui2f:
-    ldr     r2, qfp_ui2f_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_f2iz:
-    ldr     r2, qfp_f2iz_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-__wrap___aeabi_f2uiz:
-    ldr     r2, qfp_f2uiz_address_const
-    bx      r2
-
-@ DC - Farcall stub to allow the code in section time_critical (i.e. RAM) to be called from flash.
-@ DC - we renamed this to _Z9fastSqrtff so that it matches fastSqrtf(float) noexcept in C++
-@ DC - register r2 is free because it doesn't hold a parameter and the API allows r1,2,3 to be trashed
-.thumb_func
-_Z9fastSqrtff:
-    ldr     r2, qfp_fsqrt_address_const
-    bx      r2
-
-.align 2
-qfp_fadd_address_const:		.word qfp_fadd+1
-qfp_fsub_address_const:		.word qfp_fsub+1
-qfp_fmul_address_const:		.word qfp_fmul+1
-qfp_fdiv_address_const:		.word qfp_fdiv+1
-qfp_i2f_address_const:		.word qfp_int2float+1
-qfp_ui2f_address_const:		.word qfp_uint2float+1
-qfp_f2iz_address_const:		.word qfp_float2int_z+1
-qfp_f2uiz_address_const:	.word qfp_float2uint+1
-qfp_fsqrt_address_const:	.word qfp_fsqrt+1
-
 .section .time_critical
 
 #else
@@ -408,9 +331,7 @@ qfp_fcmp:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM
 __wrap___aeabi_f2iz:
-#endif
 qfp_float2int_z:
  push {r14}
  cmp r0,#0
@@ -482,9 +403,7 @@ qfp_float2fix:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM
 __wrap___aeabi_f2uiz:
-#endif
 qfp_float2uint:
  movs r1,#0      @ fall through
 .thumb_func
@@ -561,9 +480,7 @@ qfp_fix642float:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM	// DC
 __wrap___aeabi_i2f:
-#endif
 qfp_int2float:
  movs r1,#0      @ fall through
 @ convert signed fix to float, rounding; number of r0 bits after point in r1
@@ -585,9 +502,7 @@ ret_pop45:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM	// DC
 __wrap___aeabi_ui2f:
-#endif
 qfp_uint2float:
  movs r1,#0      @ fall through
 .thumb_func
@@ -990,18 +905,14 @@ tab_cc:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM
 __wrap___aeabi_fsub:
-#endif
 qfp_fsub:
  ldr r2,=#0x80000000
  eors r1,r2    @ flip sign on second argument
 @ drop into fadd, on .align2:ed boundary
 
 .thumb_func
-#if !EXEC_IN_RAM
 __wrap___aeabi_fadd:
-#endif
 qfp_fadd:
  push {r4,r5,r6,r14}
  asrs r4,r0,#31
@@ -1154,9 +1065,7 @@ fa_ye255:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM
 __wrap___aeabi_fmul:
-#endif
 qfp_fmul:
  push {r7,r14}
  mov r2,r0
@@ -1304,9 +1213,7 @@ fm_4:
 .balign 8		  @ DC align on a SAMC21 NVM cache boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM
 __wrap___aeabi_fdiv:
-#endif
 qfp_fdiv:
  push {r4,r5,r6,r14}
 fdiv_n:
@@ -1501,9 +1408,7 @@ rcpapp:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
-#if !EXEC_IN_RAM
 _Z9fastSqrtff:
-#endif
 qfp_fsqrt:
  push {r4}
  lsls r1,r0,#1
