@@ -344,12 +344,12 @@ qfp_fcmp:
 .thumb_func
 .type __wrap___aeabi_fcmpeq, %function
 __wrap___aeabi_fcmpeq:
-mov r3,lr
-bl qfp_fcmp
-movs r1,#1
-ands r0,r1
-eors r0,r1
-bx r3
+ mov r3,r14
+ bl qfp_fcmp
+ movs r1,#1
+ ands r0,r1
+ eors r0,r1
+ bx r3
 
 #if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
@@ -357,11 +357,11 @@ bx r3
 .thumb_func
 .type __wrap___aeabi_fcmple, %function
 __wrap___aeabi_fcmple:
-mov r3,lr
-bl qfp_fcmp
-subs r0,#1
-lsrs r0,#31
-bx r3
+ mov r3,r14
+ bl qfp_fcmp
+ subs r0,#1
+ lsrs r0,#31
+ bx r3
 
 #if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
@@ -369,10 +369,10 @@ bx r3
 .thumb_func
 .type __wrap___aeabi_fcmplt, %function
 __wrap___aeabi_fcmplt:
-mov r3,lr
-bl qfp_fcmp
-lsrs r0,#31
-bx r3
+ mov r3,r14
+ bl qfp_fcmp
+ lsrs r0,#31
+ bx r3
 
 #if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
@@ -380,11 +380,11 @@ bx r3
 .thumb_func
 .type __wrap___aeabi_fcmpgt, %function
 __wrap___aeabi_fcmpgt:
-mov r3,lr
-bl qfp_fcmp
-adds r0,#1
-lsrs r0,#1
-bx r4
+ mov r3,r14
+ bl qfp_fcmp
+ adds r0,#1
+ lsrs r0,#1
+ bx r3
 
 #if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
@@ -392,12 +392,12 @@ bx r4
 .thumb_func
 .type __wrap___aeabi_fcmpge, %function
 __wrap___aeabi_fcmpge:
-push {lr}
-bl qfp_fcmp
-lsrs r0,#31
-movs r1,#1
-eors r0,r1
-pop {pc}
+ mov r3,r14
+ bl qfp_fcmp
+ lsrs r0,#31
+ movs r1,#1
+ eors r0,r1
+ bx r3
 
 #endif
 
