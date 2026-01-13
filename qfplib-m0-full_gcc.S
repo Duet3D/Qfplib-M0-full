@@ -284,7 +284,7 @@ mul0:
  adds r0,r1      @ final result
  bx r14
 
- #endif
+#endif
 
 #if 1	// DC added comparison functions
 
@@ -294,6 +294,7 @@ mul0:
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
 .thumb_func
+.type qfp_fcmp, %function
 qfp_fcmp:
  lsls r2,r0,#1
  lsrs r2,#24
@@ -402,6 +403,8 @@ __wrap___aeabi_fcmpge:
 #endif
 
 @ convert float to signed int, rounding towards 0, clamping
+.type qfp_float2int, %function
+.type qfp_float2uint, %function
 #if !EXEC_IN_RAM
 .balign 8		  @ DC align on a SAMC21 NVM cache line boundary
 #endif
