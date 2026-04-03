@@ -2,8 +2,7 @@
 # Builds Qfplib-M0-full for various MCU configurations
 
 # Cross-compiler toolchain (relative to project root)
-#CROSS_COMPILE ?= ../arm-gnu-toolchain-13.2.Rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-
-CROSS_COMPILE ?= ../arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi/bin/arm-none-eabi-
+CROSS_COMPILE ?= arm-none-eabi-
 export CROSS_COMPILE
 
 # Toolchain commands
